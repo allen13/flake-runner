@@ -1,0 +1,111 @@
+{
+  "aws_profile": "default",
+  "aws_region": "us-east-1",
+  "input_bucket_name": "my-data-input-bucket",
+  "output_bucket_name": "my-data-output-bucket",
+  "staging_bucket_name": "my-data-staging-bucket",
+  "control_table_name": "file-orchestrations-dev",
+  "emr_application_id": "00f7u00a1p2k4k0k",
+  "emr_execution_role_arn": "arn:aws:iam::123456789012:role/EMRServerlessExecutionRole",
+  "job_timeout_minutes": 60,
+  "max_retries": 3,
+  "control_ttl_days": 30,
+  "prefix_mappings": [
+    {
+      "s3_prefix": "customers/",
+      "target_name": "CUSTOMERS",
+      "container_image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/flake-runner:customer-v2.0.0-emr7.8.0",
+      "entry_point": "/opt/spark/jobs/customer_processor.py",
+      "script_params": {
+        "output-format": "parquet",
+        "partition-by": "region"
+      },
+      "environment_vars": {
+        "LOG_LEVEL": "INFO",
+        "CUSTOMER_VALIDATION_MODE": "strict"
+      },
+      "processing_config": {
+        "file_format": "CSV",
+        "compression_type": "GZIP",
+        "max_file_size": 5368709120,
+        "chunk_size": 1073741824,
+        "output_format": "PARQUET",
+        "output_options": {
+          "compression": "snappy"
+        },
+        "spark_config": {
+          "spark.sql.adaptive.enabled": "true",
+          "spark.sql.adaptive.coalescePartitions.enabled": "true"
+        }
+      },
+      "validation_rules": {
+        "validate_record_count": true,
+        "validate_file_size": true,
+        "validate_checksum": true,
+        "required_fields": ["customer_id", "name", "email"]
+      }
+    },
+    {
+      "s3_prefix": "orders/",
+      "target_name": "ORDERS",
+      "container_image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/flake-runner:order-v2.0.0-emr7.8.0",
+      "entry_point": "/opt/spark/jobs/order_processor.py",
+      "script_params": {
+        "output-format": "delta",
+        "partition-by": "order_date"
+      },
+      "environment_vars": {
+        "LOG_LEVEL": "DEBUG",
+        "ORDER_VALIDATION_MODE": "lenient"
+      },
+      "processing_config": {
+        "file_format": "PARQUET",
+        "compression_type": "SNAPPY",
+        "max_file_size": 10737418240,
+        "chunk_size": 2147483648,
+        "output_format": "DELTA",
+        "spark_config": {
+          "spark.sql.adaptive.enabled": "true",
+          "spark.serializer": "org.apache.spark.serializer.KryoSerializer"
+        }
+      },
+      "validation_rules": {
+        "validate_record_count": true,
+        "validate_checksum": true,
+        "required_fields": ["order_id", "customer_id", "order_date", "amount"]
+      }
+    },
+    {
+      "s3_prefix": "analytics/",
+      "target_name": "ANALYTICS_EVENTS",
+      "container_image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/flake-runner:analytics-v2.0.0-emr7.8.0",
+      "entry_point": "/opt/spark/jobs/analytics_processor.py",
+      "script_params": {
+        "output-format": "iceberg",
+        "partition-by": "event_date,event_type"
+      },
+      "environment_vars": {
+        "LOG_LEVEL": "WARN",
+        "ANALYTICS_AGGREGATION_WINDOW": "1hour"
+      },
+      "processing_config": {
+        "file_format": "JSON",
+        "compression_type": "GZIP",
+        "max_file_size": 2147483648,
+        "chunk_size": 536870912,
+        "output_format": "ICEBERG",
+        "spark_config": {
+          "spark.sql.adaptive.enabled": "true",
+          "spark.sql.adaptive.optimizeSkewedJoin.enabled": "true",
+          "spark.sql.optimizer.runtime.bloomFilter.enabled": "true"
+        }
+      },
+      "validation_rules": {
+        "validate_record_count": true,
+        "validate_file_size": true,
+        "validate_checksum": true,
+        "required_fields": ["event_id", "user_id", "event_type", "timestamp"]
+      }
+    }
+  ]
+}

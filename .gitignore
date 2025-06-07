@@ -1,0 +1,89 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Go workspace file
+go.work
+
+# Built binaries
+flake-runner
+/flake-runner
+./flake-runner
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Configuration files with sensitive data
+*-local.json
+*-dev.json
+*.env
+.env
+
+# AWS credentials
+.aws/
+
+# Build artifacts
+dist/
+build/
+
+# Demo and test generated files
+demo-config-*.json
+test-config-*.json
+control_data.json
+downloaded_*.parquet
+downloaded_*.csv
+downloaded_*.json
+
+# Python cache files (for container scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+
+# Coverage reports
+coverage.txt
+coverage.html
+coverage.xml
+*.cover
+.coverage
+
+# Dependency directories
+node_modules/
+vendor/
+downloads/

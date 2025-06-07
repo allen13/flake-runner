@@ -1,0 +1,12 @@
+product_id,product_name,category,price,stock_quantity,supplier,created_date,description
+1,"Wireless Bluetooth Headphones",Electronics,79.99,45,"TechCorp","2024-01-15","High-quality wireless headphones with noise cancellation"
+2,"Organic Coffee Beans",Food,24.50,120,"GreenBean Co","2024-01-10","Premium organic coffee beans from sustainable farms"
+3,"Running Shoes",Footwear,89.95,30,"SportsFit","2024-01-20","Lightweight running shoes with advanced cushioning"
+4,"Stainless Steel Water Bottle",Home,19.99,75,"EcoLife","2024-01-12","BPA-free stainless steel water bottle, 32oz capacity"
+5,"Programming Book: Python Mastery",Books,45.00,25,"TechBooks","2024-01-18","Comprehensive guide to advanced Python programming"
+6,"Yoga Mat",Fitness,29.99,60,"FlexFit","2024-01-08","Non-slip yoga mat with extra cushioning"
+7,"Smartphone Case",Electronics,15.99,200,"PhoneGuard","2024-01-22","Durable protective case for smartphones"
+8,"Green Tea",Food,12.75,90,"TeaHouse","2024-01-14","Premium green tea leaves, antioxidant-rich"
+9,"Desk Lamp",Home,34.99,40,"LightWorks","2024-01-16","LED desk lamp with adjustable brightness"
+10,"Protein Powder",Fitness,39.99,55,"NutriMax","2024-01-11","Whey protein powder for muscle building"
+11,"Bluetooth Speaker",Electronics,49.99,80,"SoundWave","2024-01-25","Portable Bluetooth speaker with deep bass"

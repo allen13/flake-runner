@@ -1,0 +1,76 @@
+{
+  "aws_region": "us-east-1",
+  "input_bucket_name": "my-data-input-bucket",
+  "output_bucket_name": "my-data-output-bucket",
+  "staging_bucket_name": "my-data-staging-bucket",
+  "control_table_name": "file-orchestrations-prod",
+  "emr_application_id": "00fd12g3h4567890",
+  "emr_execution_role_arn": "arn:aws:iam::123456789012:role/EMRServerlessRole",
+  "job_timeout_minutes": 120,
+  "max_retries": 3,
+  "ttl_days": 30,
+  "prefix_table_mappings": [
+    {
+      "s3_prefix": "customers/",
+      "snowflake_table": "CUSTOMERS",
+      "container_image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/flake-runner:customer-v1.0.0",
+      "entry_point": "/opt/spark/jobs/customer_processor.py",
+      "processing_config": {
+        "file_format": "CSV",
+        "compression_type": "GZIP",
+        "max_file_size": 5368709120,
+        "parallel_loads": 4
+      },
+      "validation_rules": {
+        "validate_record_count": true,
+        "validate_file_size": true,
+        "validate_checksum": false,
+        "required_fields": ["customer_id", "name", "email"]
+      }
+    },
+    {
+      "s3_prefix": "orders/",
+      "snowflake_table": "ORDERS",
+      "container_image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/flake-runner:order-v1.0.0",
+      "entry_point": "/opt/spark/jobs/order_processor.py",
+      "processing_config": {
+        "file_format": "JSON",
+        "compression_type": "NONE",
+        "max_file_size": 1073741824,
+        "parallel_loads": 2
+      },
+      "validation_rules": {
+        "validate_record_count": true,
+        "validate_file_size": false,
+        "validate_checksum": true,
+        "required_fields": ["order_id", "customer_id", "total_amount"]
+      }
+    },
+    {
+      "s3_prefix": "products/",
+      "snowflake_table": "PRODUCTS",
+      "container_image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/flake-runner:product-v1.0.0",
+      "entry_point": "/opt/spark/jobs/product_processor.py",
+      "processing_config": {
+        "file_format": "PARQUET",
+        "compression_type": "SNAPPY",
+        "max_file_size": 10737418240,
+        "parallel_loads": 8
+      },
+      "validation_rules": {
+        "validate_record_count": false,
+        "validate_file_size": true,
+        "validate_checksum": false,
+        "required_fields": ["product_id", "name", "price"]
+      }
+    }
+  ],
+  "snowflake": {
+    "account": "your-account.us-east-1",
+    "user": "flake_runner_user",
+    "database": "DATA_WAREHOUSE",
+    "schema": "RAW_DATA",
+    "warehouse": "COMPUTE_WH",
+    "role": "DATA_LOADER_ROLE"
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "aws_profile": "default",
+  "aws_region": "us-east-1",
+  "input_bucket_name": "flake-runner-demo-input-${RANDOM_SUFFIX}",
+  "output_bucket_name": "flake-runner-demo-output-${RANDOM_SUFFIX}",
+  "staging_bucket_name": "flake-runner-demo-staging-${RANDOM_SUFFIX}",
+  "control_table_name": "flake-runner-demo-orchestrations",
+  "emr_application_id": "00f7u00a1p2demo",
+  "emr_execution_role_arn": "arn:aws:iam::123456789012:role/EMRServerlessExecutionRole-flake-runner-demo",
+  "job_timeout_minutes": 30,
+  "max_retries": 2,
+  "control_ttl_days": 7,
+  "prefix_mappings": [
+    {
+      "s3_prefix": "products/",
+      "target_name": "PRODUCTS_PARQUET",
+      "container_image": "",
+      "entry_point": "s3://flake-runner-demo-staging-${RANDOM_SUFFIX}/scripts/simple_csv_to_parquet.py",
+      "script_params": {
+        "compression": "snappy",
+        "partition-by": "category",
+        "clean-strings": "true",
+        "validate-data": "true",
+        "add-row-id": "true",
+        "max-records-per-file": "50000"
+      },
+      "environment_vars": {
+        "LOG_LEVEL": "INFO",
+        "SPARK_SERIALIZER": "org.apache.spark.serializer.KryoSerializer"
+      },
+      "processing_config": {
+        "file_format": "CSV",
+        "compression_type": "NONE",
+        "max_file_size": 10485760,
+        "output_format": "PARQUET",
+        "output_options": {
+          "compression": "snappy"
+        },
+        "spark_config": {
+          "spark.sql.adaptive.enabled": "true",
+          "spark.sql.adaptive.coalescePartitions.enabled": "true",
+          "spark.executor.memory": "4g",
+          "spark.executor.cores": "2"
+        }
+      },
+      "validation_rules": {
+        "validate_record_count": true,
+        "validate_file_size": true,
+        "validate_checksum": false,
+        "required_fields": ["product_id", "product_name", "price"]
+      }
+    },
+    {
+      "s3_prefix": "customers/",
+      "target_name": "CUSTOMERS_PARQUET", 
+      "container_image": "",
+      "entry_point": "s3://flake-runner-demo-staging-${RANDOM_SUFFIX}/scripts/simple_csv_to_parquet.py",
+      "script_params": {
+        "compression": "gzip",
+        "partition-by": "region,signup_year",
+        "clean-strings": "true",
+        "validate-data": "true",
+        "csv-delimiter": ",",
+        "csv-header": "true"
+      },
+      "environment_vars": {
+        "LOG_LEVEL": "DEBUG",
+        "CUSTOMER_VALIDATION_MODE": "strict"
+      },
+      "processing_config": {
+        "file_format": "CSV", 
+        "compression_type": "GZIP",
+        "max_file_size": 52428800,
+        "output_format": "PARQUET",
+        "spark_config": {
+          "spark.sql.adaptive.enabled": "true",
+          "spark.executor.memory": "6g",
+          "spark.executor.cores": "3"
+        }
+      },
+      "validation_rules": {
+        "validate_record_count": true,
+        "validate_file_size": true,
+        "validate_checksum": true,
+        "required_fields": ["customer_id", "email"]
+      }
+    }
+  ]
+}
