@@ -191,15 +191,28 @@ func (fr *FlakeRunner) ValidateWithControlData(filePath string, controlData *typ
 
 // DetermineTargetTable determines the target table based on S3 prefix
 func (fr *FlakeRunner) DetermineTargetTable(filePath string) (string, *config.PrefixMapping, error) {
-	prefix := extractS3Prefix(filePath)
+	_, key, err := aws.ParseS3Path(filePath)
+	if err != nil {
+		return "", nil, fmt.Errorf("failed to parse S3 path %s: %w", filePath, err)
+	}
 
-	for _, mapping := range fr.Config.PrefixMappings {
-		if mapping.S3Prefix == prefix {
-			return mapping.TargetName, &mapping, nil
+	var matched *config.PrefixMapping
+	longest := -1
+	for i := range fr.Config.PrefixMappings {
+		mapping := &fr.Config.PrefixMappings[i]
+		if strings.HasPrefix(key, mapping.S3Prefix) {
+			if len(mapping.S3Prefix) > longest {
+				longest = len(mapping.S3Prefix)
+				matched = mapping
+			}
 		}
 	}
 
-	return "", nil, fmt.Errorf("no prefix mapping found for prefix: %s", prefix)
+	if matched == nil {
+		return "", nil, fmt.Errorf("no prefix mapping found for key: %s", key)
+	}
+
+	return matched.TargetName, matched, nil
 }
 
 // SubmitSparkJob submits a PySpark job to EMR Serverless
